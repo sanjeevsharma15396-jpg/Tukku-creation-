@@ -3,6 +3,7 @@
   "expo": {
     "name": "TUKKU-CREATION",
     "slug": "tukku-creation",
+    "owner": "sanjeev1996",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
