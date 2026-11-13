@@ -16,10 +16,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 22
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
           cache: npm
           cache-dependency-path: mobile/package-lock.json
 
@@ -27,28 +27,22 @@ jobs:
         working-directory: mobile
         run: npm install --no-audit --no-fund
 
-      - name: Install Expo required packages
+      - name: Install Expo packages
         working-directory: mobile
-       run: npx expo install expo-asset expo-constants expo-font
-
-      - name: Set Expo project owner
-        working-directory: mobile
-        run: |
-          node <<'NODE'
-          const fs = require('fs');
-          const config = JSON.parse(fs.readFileSync('app.json', 'utf8'));
-          config.expo = config.expo || {};
-          config.expo.owner = 'sanjeev1996';
-          fs.writeFileSync('app.json', JSON.stringify(config, null, 2) + '\n');
-          NODE
+        run: npx expo install expo-asset expo-constants expo-font
 
       - name: Verify Expo authentication
         working-directory: mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx eas-cli@latest whoami
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error::EXPO_TOKEN secret is missing"
+            exit 1
+          fi
+          npx eas-cli@latest whoami
 
-      - name: Build Android APK via EAS
+      - name: Build Android APK
         working-directory: mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
