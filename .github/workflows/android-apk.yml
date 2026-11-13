@@ -43,9 +43,9 @@ jobs:
             console.log('Expo Project ID:', projectId);
           "
 
-      - name: Install dependencies in mobile
-        working-directory: mobile
-        npm install
+          - name: Install dependencies in mobile
+      working-directory: mobile
+      run: npm install
 
       - name: Install EAS CLI
         run: npm install -g eas-cli
