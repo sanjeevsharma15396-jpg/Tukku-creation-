@@ -29,7 +29,7 @@ jobs:
 
       - name: Install Expo required packages
         working-directory: mobile
-        run: npx expo install expo-asset expo-constants
+       run: npx expo install expo-asset expo-constants expo-font
 
       - name: Set Expo project owner
         working-directory: mobile
