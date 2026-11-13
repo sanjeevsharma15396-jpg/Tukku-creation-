@@ -1,0 +1,79 @@
+name: Build TUKKU-CREATION Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android-apk:
+    name: Build Android Preview APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Verify Expo project configuration
+        working-directory: mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error::Missing GitHub repository secret EXPO_TOKEN."
+            exit 1
+          fi
+          node -e "
+            const app = require('./app.json');
+            const eas = require('./eas.json');
+            const pkg = app.expo?.android?.package;
+            const projectId = app.expo?.extra?.eas?.projectId;
+            const buildType = eas.build?.preview?.android?.buildType;
+            console.log('Android package:', pkg);
+            console.log('EAS preview android.buildType:', buildType);
+            if (!projectId) {
+              console.error('Missing expo.extra.eas.projectId in mobile/app.json. Run npx eas-cli init inside mobile/ and commit app.json before running this workflow.');
+              process.exit(1);
+            }
+            console.log('Expo Project ID:', projectId);
+          "
+
+      - name: Install dependencies in mobile
+        working-directory: mobile
+        run: npm ci
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Verify Expo authentication
+        working-directory: mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli whoami
+
+      - name: Build Android APK via EAS Cloud
+        working-directory: mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          set -o pipefail
+          LOG_FILE="$RUNNER_TEMP/eas-build.log"
+          npx eas-cli build --platform android --profile preview --non-interactive 2>&1 | tee "$LOG_FILE"
+          BUILD_URL=$(grep -Eo 'https://expo\.dev/[^[:space:]]+/builds/[A-Za-z0-9-]+' "$LOG_FILE" | tail -n 1 || true)
+          APK_URL=$(grep -Eo 'https://expo\.dev/artifacts/eas/[^[:space:]]+\.apk' "$LOG_FILE" | tail -n 1 || true)
+          if [ -n "$BUILD_URL" ]; then
+            echo "Expo Build URL: $BUILD_URL"
+            {
+              echo "### TUKKU-CREATION Android APK Build"
+              echo "- **Expo Build URL:** $BUILD_URL"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -n "$APK_URL" ]; then
+            echo "APK Download URL: $APK_URL"
+            echo "- **APK Download URL:** $APK_URL" >> "$GITHUB_STEP_SUMMARY"
+          fi
