@@ -34,12 +34,9 @@
           "backgroundColor": "#07060B"
         }
       ]
-    ]
-  }
-}
-,
-"extra": {
+    ],
+    "extra": {
   "eas": {
-    "projectId": "YOUR_PROJECT_ID"
+    "projectId": "ACTUAL_PROJECT_ID"
   }
-}
+    }
