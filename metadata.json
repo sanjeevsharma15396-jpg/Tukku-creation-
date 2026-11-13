@@ -1,0 +1,6 @@
+{
+  "name": "TUKKU-CREATION",
+  "description": "Personal Android AI Creative Studio (Phase 1) built with React Native, Expo, and TypeScript, featuring Hindi/English localization and local project storage.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
