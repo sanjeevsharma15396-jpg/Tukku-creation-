@@ -13,7 +13,7 @@ The user will create or obtain the cartoon images separately and upload/select t
 5. Add visual motion to still images (pan, zoom in/out, gentle Ken Burns-style movement).
 6. Choose transitions between images (cut, fade, dissolve, slide).
 7. Add optional title, captions/subtitles, and end card.
-8. Add a user's own narration/audio file and optional background music; provide volume controls and audio fade in/out.
+8. Add narration in either or both modes: (a) record the user's own voice in the app, and (b) convert Hindi narration text to speech with a selectable Hindi text-to-speech voice. Allow the user to preview and replace either track. Also support optional background music, separate voice/music volume controls, and audio fade in/out.
 9. Preview the timeline and total duration.
 10. Render a real MP4 file on the Android device, show progress, allow cancellation, and save/share the output.
 
@@ -38,10 +38,12 @@ AI is optional and not required to render the video. If the existing Gemini back
 - Add reorder/remove controls, per-image duration, aspect ratio, and project persistence.
 - Add preview of the ordered image sequence.
 
-### M2 — Motion and overlays
+### M2 — Motion, overlays, and voice
 - Add pan/zoom presets and transitions.
 - Add title/captions/end card and safe-area positioning for vertical video.
-- Add audio file selection, narration/music tracks, volume, and fades.
+- Add in-app voice recording and audio file selection.
+- Add Hindi text-to-speech with voice preview/selection; disclose whether the selected voice works offline or needs a service/internet.
+- Add narration/music tracks, separate volume controls, and fades.
 
 ### M3 — MP4 rendering
 - Choose a maintained Android-compatible rendering approach compatible with the project's Expo SDK / native build.
