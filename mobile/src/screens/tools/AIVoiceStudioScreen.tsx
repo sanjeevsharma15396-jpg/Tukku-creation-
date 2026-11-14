@@ -1,3 +1,4 @@
+import { AIGenerationPanel } from '../../components/AIGenerationPanel';
 import React, { useEffect, useState } from 'react';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -117,6 +118,7 @@ export const AIVoiceStudioScreen: React.FC = () => {
         value={outputLanguage}
         onChange={setOutputLanguage}
       />
+      <AIGenerationPanel toolId="voice-studio" prompt={prompt} language={outputLanguage} />
     </ToolStudioLayout>
   );
 };
