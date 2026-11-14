@@ -3,6 +3,9 @@ name: Build TUKKU-CREATION Android APK
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
