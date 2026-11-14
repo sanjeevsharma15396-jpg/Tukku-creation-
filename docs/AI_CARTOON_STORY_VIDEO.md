@@ -47,9 +47,12 @@ AI is optional and not required to render the video. If the existing Gemini back
 ## Implementation milestones
 
 ### M1 — Image timeline UI
-- Add multi-image picker and permission handling.
-- Add reorder/remove controls, per-image duration, aspect ratio, and project persistence.
-- Add preview of the ordered image sequence.
+- [x] Add multi-image picker and permission handling (Expo ImagePicker; up to 30 images per selection).
+- [x] Add reorder/remove controls, common per-scene duration, aspect ratio, and save scene list/URIs in project metadata.
+- [x] Add ordered thumbnail preview and estimated total duration.
+- [ ] Verify gallery URI persistence across app restarts/devices and copy selected assets into app-managed storage where required.
+
+**Implementation note (15 Nov 2026):** The first M1 interface is committed in `mobile/src/screens/tools/VideoEditorScreen.tsx`. It is an image timeline/planning milestone only. It does not yet render or export an MP4.
 
 ### M2 — Motion, overlays, and voice
 - Add pan/zoom presets and transitions.
