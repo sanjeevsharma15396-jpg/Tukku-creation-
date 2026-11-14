@@ -2,6 +2,13 @@
 
 ## Confirmed product scope
 
+### User's selected direction (15 November 2026)
+- Visual target: realistic 3D cartoon animation (e.g. anthropomorphic potato and tomato characters that walk, gesture, and speak).
+- Cost priority: start with the lowest-cost workflow that still produces good-looking videos; the user may be able to spend approximately ₹200–₹300 per month, but this is a strict budget target, not authorization for recurring charges.
+- Support both vertical short-form videos (9:16) and landscape long-form YouTube videos (16:9), including 5–10 minute finished stories assembled from multiple short generated scenes.
+- Offer a free/local editing and assembly path so AI generation credits are not consumed for joining scenes, adding narration, subtitles, music, and exporting.
+- Provide optional higher-quality hosted AI scene generation only with explicit cost estimates and user approval. Never promise unlimited hosted AI video generation at this budget.
+
 The user will create or obtain the cartoon images separately and upload/select them in TUKKU-CREATION. The app's primary job is to turn those supplied images into a finished, playable MP4 video. Do not require an AI image-generation provider for this workflow.
 
 ## Android workflow
@@ -18,6 +25,12 @@ The user will create or obtain the cartoon images separately and upload/select t
 10. Render a real MP4 file on the Android device, show progress, allow cancellation, and save/share the output.
 
 ## AI role
+
+For realistic 3D motion, treat image-to-video generation as short scene generation (typically a few seconds per shot), then assemble many shots into a 5–10 minute story. Preserve character identity with consistent reference images, repeated character descriptions, and scene-by-scene prompts. Do not imply that one prompt can generate a coherent 5–10 minute animation at low cost.
+
+The app should expose two generation paths:
+- **Budget path:** free/low-cost options where available, plus still-image motion, camera moves, and local editing when no affordable AI generation is available. Explain quality and hardware/service limits honestly.
+- **Quality path:** optional paid video-generation provider/model, with per-second or per-clip price shown before generation, a monthly spending cap, and explicit confirmation. Default it off.
 
 AI is optional and not required to render the video. If the existing Gemini backend is connected later, it may help draft captions, scene order, or narration text from a story. It must not block manual image-to-video creation.
 
