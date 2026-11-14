@@ -5,7 +5,7 @@ app.use(express.json({ limit: '1mb' }));
 
 const PORT = Number(process.env.PORT || 8080);
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.7-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '*').split(',').map((x) => x.trim());
 
 app.use((req, res, next) => {
@@ -51,17 +51,17 @@ app.post('/api/generate', async (req, res) => {
   ].filter(Boolean).join('\n\n');
 
   try {
-    const upstream = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
+    const upstream = await fetch('https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_API_KEY },
-      body: JSON.stringify({ model: GEMINI_MODEL, input })
+      body: JSON.stringify({ contents: [{ parts: [{ text: input }] }] })
     });
     const data = await upstream.json().catch(() => ({}));
     if (!upstream.ok) {
       const message = data?.error?.message || 'Gemini request failed.';
       return res.status(upstream.status === 429 ? 429 : 502).json({ error: message });
     }
-    const text = data.output_text || (Array.isArray(data.outputs) ? data.outputs.map((part) => part.text || '').join('\n') : '');
+    const text = data?.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('\n') || '';
     if (!text.trim()) return res.status(502).json({ error: 'Gemini returned no text output.' });
     return res.json({ text: text.trim(), model: GEMINI_MODEL });
   } catch {
