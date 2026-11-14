@@ -13,7 +13,7 @@ gcloud run deploy tukku-creation-ai \
   --source . \
   --region asia-south1 \
   --allow-unauthenticated \
-  --set-env-vars GEMINI_MODEL=gemini-3.7-flash \
+  --set-env-vars GEMINI_MODEL=gemini-2.5-flash \
   --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest
 ``
 
