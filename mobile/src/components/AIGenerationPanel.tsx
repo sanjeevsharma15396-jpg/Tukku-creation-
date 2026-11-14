@@ -50,7 +50,7 @@ export const AIGenerationPanel: React.FC<Props> = ({ toolId, prompt, language, c
         <MaterialCommunityIcons name="creation" size={20} color={COLORS.amethyst} />
         <Text style={styles.heading}>{language === 'hi' ? 'Gemini AI जनरेशन' : 'Gemini AI Generation'}</Text>
       </View>
-      <Text style={[styles.hint, { color: theme.textMuted ?? COLORS.textMuted }]}>
+      <Text style={[styles.hint, { color: COLORS.textMuted }]}>
         {language === 'hi'
           ? 'आपका आउटपुट अपने आप My Projects में सेव होगा।'
           : 'Your generated result is automatically saved to My Projects.'}
