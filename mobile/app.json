@@ -1,4 +1,3 @@
-
 {
   "expo": {
     "name": "TUKKU-CREATION",
@@ -21,7 +20,10 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#14092A"
-      }
+      },
+      "permissions": [
+        "READ_MEDIA_IMAGES"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,7 +37,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#07060B"
         }
-      ]
+      ],
+      "expo-image-picker"
     ],
     "extra": {
       "eas": {
@@ -44,4 +47,3 @@
     }
   }
 }
-
