@@ -1,3 +1,4 @@
+import { AIGenerationPanel } from '../../components/AIGenerationPanel';
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -145,6 +146,7 @@ export const VideoEditorScreen: React.FC = () => {
         value={outputLanguage}
         onChange={setOutputLanguage}
       />
+      <AIGenerationPanel toolId="video-editor" prompt={prompt} language={outputLanguage} />
     </ToolStudioLayout>
   );
 };
