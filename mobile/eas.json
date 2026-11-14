@@ -1,16 +1,9 @@
+
 {
   "cli": {
-    "version": ">= 13.2.0",
-    "appVersionSource": "local"
+    "version": ">= 14.0.0"
   },
   "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      }
-    },
     "preview": {
       "distribution": "internal",
       "android": {
@@ -20,11 +13,7 @@
     "production": {
       "android": {
         "buildType": "app-bundle"
-      },
-      "autoIncrement": true
+      }
     }
-  },
-  "submit": {
-    "production": {}
   }
 }
