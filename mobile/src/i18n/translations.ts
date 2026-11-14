@@ -201,7 +201,7 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
       storageErrorBody: 'स्थानीय डेटा पढ़ते या सहेजते समय त्रुटि हुई। कृपया पुनः प्रयास करें।',
       viewInProjects: 'मेरे प्रोजेक्ट्स में देखें',
       refresh: 'रिफ्रेश',
-      phaseOneTag: 'चरण 1 · लोकल सेव',
+      phaseOneTag: 'Gemini AI · टेक्स्ट जनरेशन',
     },
     tabs: {
       home: 'होम',
@@ -227,9 +227,9 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     create: {
       headerTitle: 'क्रिएट स्टूडियो',
       headerSubtitle: 'प्रॉम्प्ट तैयार करें और स्थानीय रूप से सेव करें',
-      phaseNoticeTitle: 'चरण 1 · स्थानीय ड्राफ्ट मोड',
+      phaseNoticeTitle: 'Gemini AI · टेक्स्ट जनरेशन',
       phaseNoticeBody:
-        'इस चरण में नकली AI आउटपुट नहीं बनाया जाता। आपका प्रॉम्प्ट और प्रोजेक्ट संरचना सुरक्षित रूप से डिवाइस पर सेव होती है; AI इंजन चरण 2 में जुड़ेगा।',
+        'Gemini से टेक्स्ट स्क्रिप्ट, स्टोरी और क्रिएटिव प्लान बनाएं। इमेज, वीडियो और ऑडियो फाइल रेंडरिंग के लिए अलग मीडिया सेवाएं जोड़नी होंगी।',
       selectToolLabel: 'स्टूडियो टूल चुनें',
       projectTitleLabel: 'प्रोजेक्ट शीर्षक',
       projectTitlePlaceholder: 'उदा. हिमालय की रहस्यमयी कहानी',
@@ -274,7 +274,7 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
         audioVideo: 'वॉइस व वीडियो',
       },
       openTool: 'स्टूडियो खोलें',
-      phase1Label: 'चरण 1 तैयार · लोकल सेव',
+      phase1Label: 'Gemini AI · टेक्स्ट जनरेशन',
     },
     toolScreens: {
       story: {
@@ -386,7 +386,7 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
       storageErrorBody: 'Unable to read or write local storage. Please try again.',
       viewInProjects: 'View in My Projects',
       refresh: 'Refresh',
-      phaseOneTag: 'Phase 1 · Local Save',
+      phaseOneTag: 'Gemini AI · Text generation',
     },
     tabs: {
       home: 'Home',
