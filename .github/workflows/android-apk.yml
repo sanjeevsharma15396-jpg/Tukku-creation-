@@ -1,8 +1,13 @@
-
-name: Build TUKKU-CREATION Android APK
+name: TUKKU-CREATION checks and optional Android APK
 
 on:
   workflow_dispatch:
+    inputs:
+      build_apk:
+        description: "Build an APK on Expo (uses a monthly Android build)"
+        required: true
+        type: boolean
+        default: false
   push:
     branches:
       - main
@@ -11,10 +16,9 @@ permissions:
   contents: read
 
 jobs:
-  build-android-apk:
-    name: Build Android Preview APK
+  typecheck:
+    name: TypeScript and Expo checks
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,21 +26,41 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "22"
           cache: npm
           cache-dependency-path: mobile/package-lock.json
 
       - name: Install dependencies
         working-directory: mobile
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
-      - name: Install Expo packages
-        working-directory: mobile
-        run: npx expo install expo-asset expo-constants expo-font
-
-      - name: TypeScript typecheck
+      - name: Check TypeScript
         working-directory: mobile
         run: npm run typecheck
+
+      - name: Validate Expo config
+        working-directory: mobile
+        run: npx expo config --type public
+
+  build-android-apk:
+    name: Build Android Preview APK
+    if: github.event_name == 'workflow_dispatch' && inputs.build_apk == true
+    needs: typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        working-directory: mobile
+        run: npm ci --no-audit --no-fund
 
       - name: Verify Expo authentication
         working-directory: mobile
@@ -54,4 +78,3 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: npx eas-cli@latest build --platform android --profile preview --non-interactive
-        
