@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AIToolId, AppLanguage } from '../types';
 import { useApp } from '../context/AppContext';
 import { COLORS, RADIUS } from '../theme/colors';
-import { generateWithGemini } from '../services/aiService';
+import { generateOfflineDraft, generateWithGemini, isAiServerConfigured } from '../services/aiService';
 
 interface Props {
   toolId: AIToolId;
@@ -18,25 +18,35 @@ export const AIGenerationPanel: React.FC<Props> = ({ toolId, prompt, language, c
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
+  const [mode, setMode] = useState<'offline' | 'gemini' | null>(null);
 
-  const generate = async () => {
+  const saveResult = async (text: string, generatedMode: 'offline' | 'gemini') => {
+    setResult(text);
+    setMode(generatedMode);
+    await upsertProject({
+      title: `${generatedMode === 'gemini' ? 'AI' : 'Free'} ${toolId} · ${prompt.trim().slice(0, 30)}`,
+      prompt: text,
+      toolId,
+      outputLanguage: language,
+      metadata: { ...(context ?? {}), generatedBy: generatedMode === 'gemini' ? 'Gemini' : 'Free Offline Mode' },
+    });
+  };
+
+  const generate = async (useGemini: boolean) => {
     if (!prompt.trim()) {
       setError(language === 'hi' ? 'पहले अपना प्रॉम्प्ट लिखें।' : 'Please enter a prompt first.');
       return;
     }
     setLoading(true);
     setError('');
-    setResult('');
     try {
-      const text = await generateWithGemini({ toolId, prompt: prompt.trim(), language, context });
-      setResult(text);
-      await upsertProject({
-        title: `AI ${toolId} · ${prompt.trim().slice(0, 34)}`,
-        prompt: text,
-        toolId,
-        outputLanguage: language,
-        metadata: { ...(context ?? {}), generatedBy: 'Gemini' },
-      });
+      if (useGemini) {
+        const text = await generateWithGemini({ toolId, prompt: prompt.trim(), language, context });
+        await saveResult(text, 'gemini');
+      } else {
+        const text = generateOfflineDraft({ toolId, prompt: prompt.trim(), language, context });
+        await saveResult(text, 'offline');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to generate content.');
     } finally {
@@ -48,28 +58,35 @@ export const AIGenerationPanel: React.FC<Props> = ({ toolId, prompt, language, c
     <View style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.borderStrong }]}>
       <View style={styles.headingRow}>
         <MaterialCommunityIcons name="creation" size={20} color={COLORS.amethyst} />
-        <Text style={styles.heading}>{language === 'hi' ? 'Gemini AI जनरेशन' : 'Gemini AI Generation'}</Text>
+        <Text style={styles.heading}>{language === 'hi' ? 'क्रिएशन असिस्टेंट' : 'Creation Assistant'}</Text>
       </View>
       <Text style={[styles.hint, { color: COLORS.textMuted }]}>
         {language === 'hi'
-          ? 'आपका आउटपुट अपने आप My Projects में सेव होगा।'
-          : 'Your generated result is automatically saved to My Projects.'}
+          ? 'Free Offline Mode बिना Server और बिना भुगतान के रूपरेखा बनाता है। Gemini AI Server जुड़ने पर अलग विकल्प मिलेगा।'
+          : 'Free Offline Mode creates an outline without a server or payment. Gemini AI becomes available when a server is connected.'}
       </Text>
       <Pressable
-        onPress={generate}
+        onPress={() => generate(false)}
         disabled={loading}
         accessibilityRole="button"
         style={({ pressed }) => [styles.button, pressed && styles.pressed, loading && styles.disabled]}
       >
-        {loading ? <ActivityIndicator color="#FFFFFF" /> : <MaterialCommunityIcons name="auto-fix" size={18} color="#FFFFFF" />}
-        <Text style={styles.buttonText}>
-          {loading ? (language === 'hi' ? 'तैयार हो रहा है…' : 'Generating…') : (language === 'hi' ? 'Gemini से बनाएं' : 'Generate with Gemini')}
-        </Text>
+        {loading ? <ActivityIndicator color="#FFFFFF" /> : <MaterialCommunityIcons name="lightning-bolt" size={18} color="#FFFFFF" />}
+        <Text style={styles.buttonText}>{loading ? (language === 'hi' ? 'तैयार हो रहा है…' : 'Preparing…') : (language === 'hi' ? 'मुफ्त Offline रूपरेखा बनाएं' : 'Create free offline outline')}</Text>
       </Pressable>
+      {#if false}
+      {/if}
+      {isAiServerConfigured ? (
+        <Pressable onPress={() => generate(true)} disabled={loading} style={[styles.secondaryButton, loading && styles.disabled]}>
+          <Text style={styles.secondaryText}>{language === 'hi' ? 'Gemini AI से बनाएं' : 'Generate with Gemini AI'}</Text>
+        </Pressable>
+      ) : (
+        <Text style={styles.status}>{language === 'hi' ? 'Gemini Server अभी कनेक्ट नहीं है। Offline सुविधा उपलब्ध है।' : 'Gemini server is not connected. Offline tools are available.'}</Text>
+      )}
       {!!error && <Text style={styles.error}>{error}</Text>}
       {!!result && (
         <View style={[styles.resultBox, { backgroundColor: theme.surfaceElevated, borderColor: theme.border }]}>
-          <Text style={styles.resultLabel}>{language === 'hi' ? 'AI परिणाम' : 'AI Result'}</Text>
+          <Text style={styles.resultLabel}>{mode === 'gemini' ? 'Gemini AI' : (language === 'hi' ? 'Free Offline रूपरेखा' : 'Free Offline Outline')}</Text>
           <Text selectable style={styles.resultText}>{result}</Text>
           <Text style={styles.saved}><MaterialCommunityIcons name="check-circle" size={14} color="#86EFAC" /> {t.create.savedToast}</Text>
         </View>
@@ -85,11 +102,14 @@ const styles = StyleSheet.create({
   hint: { fontSize: 12.5, lineHeight: 18 },
   button: { minHeight: 48, borderRadius: RADIUS.md, backgroundColor: COLORS.violetPrimary, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, paddingHorizontal: 14 },
   buttonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
+  secondaryButton: { minHeight: 42, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.amethyst, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12 },
+  secondaryText: { color: COLORS.amethyst, fontSize: 13, fontWeight: '800' },
+  status: { color: COLORS.textMuted, fontSize: 12, lineHeight: 18 },
   pressed: { opacity: 0.85 },
   disabled: { opacity: 0.65 },
   error: { color: COLORS.danger, fontSize: 12.5, lineHeight: 18 },
   resultBox: { borderWidth: 1, borderRadius: RADIUS.md, padding: 12, gap: 8 },
   resultLabel: { color: COLORS.amethyst, fontWeight: '800', fontSize: 13 },
   resultText: { color: COLORS.textPrimary, fontSize: 13.5, lineHeight: 21 },
-  saved: { color: '#86EFAC', fontSize: 11.5, flexDirection: 'row', alignItems: 'center' },
+  saved: { color: '#86EFAC', fontSize: 11.5 },
 });
