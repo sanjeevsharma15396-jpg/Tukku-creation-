@@ -1,0 +1,50 @@
+name: Deploy TUKKU-CREATION AI Backend
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Enable required APIs
+        run: |
+          gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com --project "${{ secrets.GCP_PROJECT_ID }}"
+
+      - name: Deploy backend to Cloud Run
+        working-directory: backend
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          test -n "$GEMINI_API_KEY" || (echo "::error::GEMINI_API_KEY GitHub secret is missing" && exit 1)
+          gcloud run deploy tukku-creation-ai \
+            --source . \
+            --project "${{ secrets.GCP_PROJECT_ID }}" \
+            --region asia-south1 \
+            --allow-unauthenticated \
+            --set-env-vars "GEMINI_MODEL=gemini-2.5-flash,GEMINI_API_KEY=$GEMINI_API_KEY" \
+            --quiet
+
+      - name: Show backend URL and health check
+        run: |
+          URL="$(gcloud run services describe tukku-creation-ai --project "${{ secrets.GCP_PROJECT_ID }}" --region asia-south1 --format='value(status.url)')"
+          echo "Backend URL: $URL"
+          curl --fail --silent --show-error "$URL/health"
+          echo "## TUKKU-CREATION Backend" >> "$GITHUB_STEP_SUMMARY"
+          echo "Backend deployed and health check passed: $URL" >> "$GITHUB_STEP_SUMMARY"
