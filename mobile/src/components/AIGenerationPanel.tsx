@@ -74,8 +74,6 @@ export const AIGenerationPanel: React.FC<Props> = ({ toolId, prompt, language, c
         {loading ? <ActivityIndicator color="#FFFFFF" /> : <MaterialCommunityIcons name="lightning-bolt" size={18} color="#FFFFFF" />}
         <Text style={styles.buttonText}>{loading ? (language === 'hi' ? 'तैयार हो रहा है…' : 'Preparing…') : (language === 'hi' ? 'मुफ्त Offline रूपरेखा बनाएं' : 'Create free offline outline')}</Text>
       </Pressable>
-      {#if false}
-      {/if}
       {isAiServerConfigured ? (
         <Pressable onPress={() => generate(true)} disabled={loading} style={[styles.secondaryButton, loading && styles.disabled]}>
           <Text style={styles.secondaryText}>{language === 'hi' ? 'Gemini AI से बनाएं' : 'Generate with Gemini AI'}</Text>
