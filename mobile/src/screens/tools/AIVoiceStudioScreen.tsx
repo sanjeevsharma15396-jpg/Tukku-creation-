@@ -113,7 +113,7 @@ export const AIVoiceStudioScreen: React.FC = () => {
       <OutputLanguagePicker label={t.create.outputLanguageLabel} value={outputLanguage} onChange={setOutputLanguage} />
       <View style={[styles.ttsCard, { backgroundColor: theme.surface, borderColor: theme.border }]}>
         <Text style={styles.ttsTitle}>Free Phone Voice · मुफ्त आवाज</Text>
-        <Text style={[styles.ttsHint, { color: theme.textMuted }]}>
+        <Text style={[styles.ttsHint, { color: COLORS.textMuted }]}>
           फोन की Text-to-Speech आवाज इस्तेमाल होगी। Hindi voice आपके Android फोन में उपलब्ध होनी चाहिए।
         </Text>
         <View style={styles.ttsActions}>
@@ -122,7 +122,7 @@ export const AIVoiceStudioScreen: React.FC = () => {
           </Pressable>
           <Pressable accessibilityRole="button" onPress={() => { Speech.stop(); setIsSpeaking(false); }}
             style={[styles.stopButton, { borderColor: theme.border }]}>
-            <Text style={[styles.stopButtonText, { color: theme.textPrimary }]}>■ रोकें</Text>
+            <Text style={[styles.stopButtonText, { color: COLORS.textPrimary }]}>■ रोकें</Text>
           </Pressable>
         </View>
       </View>
