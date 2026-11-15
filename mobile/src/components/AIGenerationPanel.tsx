@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AIToolId, AppLanguage } from '../types';
 import { useApp } from '../context/AppContext';
 import { COLORS, RADIUS } from '../theme/colors';
 import { generateOfflineDraft, generateWithGemini, isAiServerConfigured } from '../services/aiService';
+import { consumeFreeAiUse, FREE_AI_DAILY_LIMIT, getDailyAiUsage } from '../services/usageService';
 
 interface Props {
   toolId: AIToolId;
@@ -19,6 +20,15 @@ export const AIGenerationPanel: React.FC<Props> = ({ toolId, prompt, language, c
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
   const [mode, setMode] = useState<'offline' | 'gemini' | null>(null);
+  const [dailyCount, setDailyCount] = useState(0);
+  const [limitReached, setLimitReached] = useState(false);
+
+  useEffect(() => {
+    getDailyAiUsage().then((usage) => {
+      setDailyCount(usage.count);
+      setLimitReached(usage.count >= FREE_AI_DAILY_LIMIT);
+    }).catch(() => {});
+  }, []);
 
   const saveResult = async (text: string, generatedMode: 'offline' | 'gemini') => {
     setResult(text);
@@ -41,14 +51,21 @@ export const AIGenerationPanel: React.FC<Props> = ({ toolId, prompt, language, c
     setError('');
     try {
       if (useGemini) {
+        if (limitReached) throw new Error('FREE_AI_LIMIT_REACHED');
         const text = await generateWithGemini({ toolId, prompt: prompt.trim(), language, context });
+        const usage = await consumeFreeAiUse();
+        setDailyCount(usage.count);
+        setLimitReached(usage.count >= FREE_AI_DAILY_LIMIT);
         await saveResult(text, 'gemini');
       } else {
         const text = generateOfflineDraft({ toolId, prompt: prompt.trim(), language, context });
         await saveResult(text, 'offline');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to generate content.');
+      const message = err instanceof Error ? err.message : 'Unable to generate content.';
+      setError(message === 'FREE_AI_LIMIT_REACHED'
+        ? (language === 'hi' ? 'आज की 10 मुफ्त AI requests पूरी हो गईं। Premium सुविधा उपलब्ध होने पर subscription लेकर जारी रख सकेंगे।' : 'You have used today’s 10 free AI requests. You can continue with a subscription when Premium is available.')
+        : message);
     } finally {
       setLoading(false);
     }
@@ -75,8 +92,9 @@ export const AIGenerationPanel: React.FC<Props> = ({ toolId, prompt, language, c
         <Text style={styles.buttonText}>{loading ? (language === 'hi' ? 'तैयार हो रहा है…' : 'Preparing…') : (language === 'hi' ? 'मुफ्त Offline रूपरेखा बनाएं' : 'Create free offline outline')}</Text>
       </Pressable>
       {isAiServerConfigured ? (
-        <Pressable onPress={() => generate(true)} disabled={loading} style={[styles.secondaryButton, loading && styles.disabled]}>
-          <Text style={styles.secondaryText}>{language === 'hi' ? 'Gemini AI से बनाएं' : 'Generate with Gemini AI'}</Text>
+        <Text style={styles.status}>{language === 'hi' ? `आज की मुफ्त AI requests: ${dailyCount}/${FREE_AI_DAILY_LIMIT}` : `Free AI requests today: ${dailyCount}/${FREE_AI_DAILY_LIMIT}`}</Text>
+        <Pressable onPress={() => generate(true)} disabled={loading || limitReached} style={[styles.secondaryButton, (loading || limitReached) && styles.disabled]}>
+          <Text style={styles.secondaryText}>{limitReached ? (language === 'hi' ? 'मुफ्त सीमा पूरी — Premium बाद में' : 'Free limit reached — Premium later') : (language === 'hi' ? 'Gemini AI से बनाएं' : 'Generate with Gemini AI')}</Text>
         </Pressable>
       ) : (
         <Text style={styles.status}>{language === 'hi' ? 'Gemini Server अभी कनेक्ट नहीं है। Offline सुविधा उपलब्ध है।' : 'Gemini server is not connected. Offline tools are available.'}</Text>
