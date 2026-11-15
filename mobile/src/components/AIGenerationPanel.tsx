@@ -64,7 +64,7 @@ export const AIGenerationPanel: React.FC<Props> = ({ toolId, prompt, language, c
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unable to generate content.';
       setError(message === 'FREE_AI_LIMIT_REACHED'
-        ? (language === 'hi' ? 'आज की 10 मुफ्त AI requests पूरी हो गईं। Premium सुविधा उपलब्ध होने पर subscription लेकर जारी रख सकेंगे।' : 'You have used today’s 10 free AI requests. You can continue with a subscription when Premium is available.')
+        ? (language === 'hi' ? 'आज की 10 requests की स्थानीय सीमा पूरी हो गई है। Premium या भुगतान अभी ऐप में उपलब्ध नहीं है; मुफ्त Offline रूपरेखा इस्तेमाल करें।' : 'The local 10-request limit has been reached. Premium or paid access is not available in this app; use the free offline outline.')
         : message);
     } finally {
       setLoading(false);
@@ -95,7 +95,7 @@ export const AIGenerationPanel: React.FC<Props> = ({ toolId, prompt, language, c
         <>
           <Text style={styles.status}>{language === 'hi' ? `आज की मुफ्त AI requests: ${dailyCount}/${FREE_AI_DAILY_LIMIT}` : `Free AI requests today: ${dailyCount}/${FREE_AI_DAILY_LIMIT}`}</Text>
           <Pressable onPress={() => generate(true)} disabled={loading || limitReached} style={[styles.secondaryButton, (loading || limitReached) && styles.disabled]}>
-            <Text style={styles.secondaryText}>{limitReached ? (language === 'hi' ? 'मुफ्त सीमा पूरी — Premium बाद में' : 'Free limit reached — Premium later') : (language === 'hi' ? 'Gemini AI से बनाएं' : 'Generate with Gemini AI')}</Text>
+            <Text style={styles.secondaryText}>{limitReached ? (language === 'hi' ? 'आज की सीमा पूरी' : 'Daily limit reached') : (language === 'hi' ? 'Gemini AI से बनाएं' : 'Generate with Gemini AI')}</Text>
           </Pressable>
         </>
       ) : (
