@@ -34,6 +34,10 @@ jobs:
         working-directory: mobile
         run: npx expo install expo-asset expo-constants expo-font
 
+      - name: TypeScript typecheck
+        working-directory: mobile
+        run: npm run typecheck
+
       - name: Verify Expo authentication
         working-directory: mobile
         env:
