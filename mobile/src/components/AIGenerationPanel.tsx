@@ -92,10 +92,12 @@ export const AIGenerationPanel: React.FC<Props> = ({ toolId, prompt, language, c
         <Text style={styles.buttonText}>{loading ? (language === 'hi' ? 'तैयार हो रहा है…' : 'Preparing…') : (language === 'hi' ? 'मुफ्त Offline रूपरेखा बनाएं' : 'Create free offline outline')}</Text>
       </Pressable>
       {isAiServerConfigured ? (
-        <Text style={styles.status}>{language === 'hi' ? `आज की मुफ्त AI requests: ${dailyCount}/${FREE_AI_DAILY_LIMIT}` : `Free AI requests today: ${dailyCount}/${FREE_AI_DAILY_LIMIT}`}</Text>
-        <Pressable onPress={() => generate(true)} disabled={loading || limitReached} style={[styles.secondaryButton, (loading || limitReached) && styles.disabled]}>
-          <Text style={styles.secondaryText}>{limitReached ? (language === 'hi' ? 'मुफ्त सीमा पूरी — Premium बाद में' : 'Free limit reached — Premium later') : (language === 'hi' ? 'Gemini AI से बनाएं' : 'Generate with Gemini AI')}</Text>
-        </Pressable>
+        <>
+          <Text style={styles.status}>{language === 'hi' ? `आज की मुफ्त AI requests: ${dailyCount}/${FREE_AI_DAILY_LIMIT}` : `Free AI requests today: ${dailyCount}/${FREE_AI_DAILY_LIMIT}`}</Text>
+          <Pressable onPress={() => generate(true)} disabled={loading || limitReached} style={[styles.secondaryButton, (loading || limitReached) && styles.disabled]}>
+            <Text style={styles.secondaryText}>{limitReached ? (language === 'hi' ? 'मुफ्त सीमा पूरी — Premium बाद में' : 'Free limit reached — Premium later') : (language === 'hi' ? 'Gemini AI से बनाएं' : 'Generate with Gemini AI')}</Text>
+          </Pressable>
+        </>
       ) : (
         <Text style={styles.status}>{language === 'hi' ? 'Gemini Server अभी कनेक्ट नहीं है। Offline सुविधा उपलब्ध है।' : 'Gemini server is not connected. Offline tools are available.'}</Text>
       )}
